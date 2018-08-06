@@ -1,10 +1,16 @@
 package me.leolin.shortcutbadger.example;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,11 +22,14 @@ import me.leolin.shortcutbadger.ShortcutBadger;
 
 public class MainActivity extends Activity {
 
-
+    NetworkChangeReceiver mNetworkReceiver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mNetworkReceiver = new NetworkChangeReceiver();
+        registerNetworkBroadcastForNougat();
 
         final EditText numInput = findViewById(R.id.numInput);
 
@@ -53,9 +62,9 @@ public class MainActivity extends Activity {
                 }
 
                 finish();
-                startService(
-                    new Intent(MainActivity.this, BadgeIntentService.class).putExtra("badgeCount", badgeCount)
-                );
+                Intent intent = new Intent(MainActivity.this, BadgeIntentService.class);
+                intent.putExtra("badgeCount", badgeCount);
+                startService(intent);
             }
         });
 
@@ -80,5 +89,20 @@ public class MainActivity extends Activity {
         textViewHomePackage.setText("launcher:" + currentHomePackage);
     }
 
+    public boolean isOnline(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        //should check null because in airplane mode it will be null
+        return (netInfo != null && netInfo.isConnected());
+    }
+
+    private void registerNetworkBroadcastForNougat() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        }
+    }
 
 }
