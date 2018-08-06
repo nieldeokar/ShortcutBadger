@@ -214,7 +214,7 @@ CHANGE LOG
 
 1.1.13:
 
-* Fix XiaomiBadger (tested with RedMi Note4)
+* Fix XiaomiBadger (tested with RedMi Note4).
 
 1.1.12:
 
@@ -224,7 +224,7 @@ CHANGE LOG
 
 1.1.11:
 
-* Add OPPO Launcher Support
+* Add OPPO Launcher Support.
 
 1.1.10:
 
